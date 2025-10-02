@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: cloud-chrome:latest
+    container_name: cloud-chrome
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ:-Etc/UTC}
+      - DISPLAY=:0
+      - SCREEN_WIDTH=${SCREEN_WIDTH:-1280}
+      - SCREEN_HEIGHT=${SCREEN_HEIGHT:-800}
+      - SCREEN_DEPTH=${SCREEN_DEPTH:-24}
+      - VNC_PASSWORD=${VNC_PASSWORD}
+      - CHROME_FLAGS=${CHROME_FLAGS:-}
+    ports:
+      - "6080:6080" # noVNC
+      - "5900:5900" # VNC (optional)
+    volumes:
+      - ./data/profile:/home/chrome/profile
+      - ./data/downloads:/home/chrome/downloads
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  # Using bind mounts above for clarity; named volumes can be used instead
+
+
